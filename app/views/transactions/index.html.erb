@@ -6,7 +6,7 @@
   <% for transaction in transactions %>
     <% if transaction["from_user_id"] %>
       <li>
-        <%=transaction["amount"]%> KC from <%=transaction["from_user_id"]%> to <%=transaction["to_user_id"]%>
+        <%=transaction["amount"]%> KC from <%=User.find_by(id:transaction["from_user_id"])["name"]%> to <%=User.find_by(id:transaction["to_user_id"])["name"]%>
       </li>
       <% else %>
       <li>
@@ -17,6 +17,27 @@
 </ol>
 
 <!-- Step 2: Calculate and display the balances -->
+
+<%users = User.all%>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Balance</th>
+  </tr>
+      <% for user in users %>
+      <% user_received = Transaction.where({ "to_user_id" => user["id"] }).sum("amount") %>
+      <% user_paid = Transaction.where({ "from_user_id" => user["id"] }).sum("amount") %>
+      <% user_balance = user_received - user_paid %>
+      <tr>
+        <td><%= user["name"] %></td>
+        <td><%= user_balance %></td>
+      </tr>
+    <% end %>
+</table>
+
+<% users = User.all %>
+
 
 <!-- 
 Expected balances:
